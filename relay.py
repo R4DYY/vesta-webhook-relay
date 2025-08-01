@@ -3,18 +3,26 @@ import httpx
 
 app = FastAPI()
 
-NGROK_URL = "https://0cfb5b6a3ba8.ngrok-free.app"  # ⬅️ ton tunnel vers le local
+# URL de ton bot local accessible via Ngrok
+NGROK_URL = "https://0cfb5b6a3ba8.ngrok-free.app/shopify-webhook"
 
 @app.post("/shopify-webhook")
 async def relay_shopify(request: Request):
-    body = await request.body()
-    headers = dict(request.headers)
+    try:
+        body = await request.body()
+        headers = dict(request.headers)
 
-    async with httpx.AsyncClient() as client:
-        response = await client.post(
-            f"{NGROK_URL}/shopify-webhook",
-            content=body,
-            headers=headers,
-            timeout=10.0
-        )
-    return {"status": "relayed", "to": NGROK_URL}
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                NGROK_URL,
+                content=body,
+                headers=headers,
+                timeout=10.0
+            )
+
+        print(f"✅ Webhook relayed → {NGROK_URL} (status {response.status_code})")
+        return {"status": "relayed", "response_status": response.status_code}
+
+    except Exception as e:
+        print(f"❌ Erreur pendant le relay : {e}")
+        return {"status": "error", "details": str(e)}
