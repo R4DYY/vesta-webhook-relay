@@ -3,7 +3,7 @@ import httpx
 
 app = FastAPI()
 
-NGROK_URL = "https://0cfb5b6a3ba8.ngrok-free.app"  # ✅ ton tunnel local
+NGROK_URL = "https://0cfb5b6a3ba8.ngrok-free.app"  # lien vers ton bot local
 
 @app.post("/shopify-webhook")
 async def relay_shopify(request: Request):
@@ -17,4 +17,5 @@ async def relay_shopify(request: Request):
             headers=headers,
             timeout=10.0
         )
+
     return {"status": "relayed", "to": NGROK_URL}
